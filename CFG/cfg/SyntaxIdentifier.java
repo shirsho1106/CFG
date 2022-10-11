@@ -78,7 +78,4 @@ public class SyntaxIdentifier {
         statement = statement.replaceAll("\\s","");
         return statement.charAt(statement.length()-1)=='}';
     }
-      
 }
-
-

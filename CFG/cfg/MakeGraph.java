@@ -31,7 +31,7 @@ public class MakeGraph {
     public void start() throws IOException{
         cur=0;
         
-        while(Lines.get(cur).contains("intmain(){") || Lines.get(cur).charAt(0)=='#' || (Lines.get(cur).charAt(0)=='/' && Lines.get(cur).charAt(0)=='/')){
+        while(Lines.get(cur).contains("intmain(){") || Lines.get(cur).charAt(0)=='#' || Lines.get(cur).charAt(0)=='/'){
             cur++;
         }
         
@@ -49,8 +49,8 @@ public class MakeGraph {
         //DrawGraph draw = new DrawGraph();
         //nodesInLevel = draw.drawGraphWithAjacencyMatrix(adj,cur+1,root.nodeNumber);
         //System.out.println("nodesInLevel has currently size "+ nodesInLevel.size());
-        Draw drawGraph = new Draw();
-        drawGraph.main();
+        //Draw drawGraph = new Draw();
+      //  drawGraph.main();
     }
     
     
@@ -61,106 +61,71 @@ public class MakeGraph {
         //System.out.println(branchRoot.nodeNumber+" "+inLoop);
         
         while(cur<Lines.size()) {
-        //System.out.println("finished " + cur);
-        Node curNode = new Node(cur,Lines.get(cur));
-        
-        if(checker.isElse(curNode.Statement)){
-            //System.out.println("Else - "+ curNode.Statement);
-            
-            par.childs.add(curNode);
-            cur++;
-            branchingsOfThisBranch.add(makeRelations(curNode, false));
-        }
-        
-        
-        
-        
-        
-        
-        
-        else if(checker.isElseIf(curNode.Statement)){
-            //System.out.println("Else If - "+ curNode.Statement);
-            
-            par.childs.add(curNode);
-            cur++;
-            branchingsOfThisBranch.add(makeRelations(curNode, false));
-        }
-        
-        
-        
-        
-        
-        
-        else if(checker.isIf(curNode.Statement)){
-            //System.out.println("If - "+ curNode.Statement);
-            
-            if(branchingsOfThisBranch.size()>0){
-                for(int i=0; i<branchingsOfThisBranch.size(); i++){
-                    branchingsOfThisBranch.get(i).childs.add(curNode);
+            //System.out.println("finished " + cur);
+            Node curNode = new Node(cur,Lines.get(cur));
+
+            if(checker.isElse(curNode.Statement)){
+                //System.out.println("Else - "+ curNode.Statement);
+
+                par.childs.add(curNode);
+                cur++;
+                branchingsOfThisBranch.add(makeRelations(curNode, false));
+            }
+            else if(checker.isElseIf(curNode.Statement)){
+                par.childs.add(curNode);
+                cur++;
+                branchingsOfThisBranch.add(makeRelations(curNode, false));
+            }
+            else if(checker.isIf(curNode.Statement)){
+                if(branchingsOfThisBranch.size()>0){
+                    for(int i=0; i<branchingsOfThisBranch.size(); i++){
+                        branchingsOfThisBranch.get(i).childs.add(curNode);
+                        branchingsOfThisBranch.clear();
+                    }
+                }
+                else{
+                    par.childs.add(curNode);
+                }
+                cur++;
+                branchingsOfThisBranch.add(makeRelations(curNode, false));
+            }
+            else if(checker.isLoop(curNode.Statement)){
+                //System.out.println("loop - "+ curNode.Statement);
+
+                if(branchingsOfThisBranch.size()>0){
+                    for(int i=0; i<branchingsOfThisBranch.size(); i++){
+                        branchingsOfThisBranch.get(i).childs.add(curNode);
+                        branchingsOfThisBranch.clear();
+                    }
+                }
+                else{
+                    par.childs.add(curNode);
+                }
+                branchingsOfThisBranch.add(curNode);
+                cur++;
+                makeRelations(curNode, true);
+            }
+            else{
+                //System.out.println("Statement - "+ curNode.Statement+branchingsOfThisBranch.size());
+                 if(branchingsOfThisBranch.size()>0){
+                    for(int i=0; i<branchingsOfThisBranch.size(); i++){
+                        branchingsOfThisBranch.get(i).childs.add(curNode);
+                    }
                     branchingsOfThisBranch.clear();
                 }
-            }
-            else{
-                par.childs.add(curNode);
-            }
-            cur++;
-            branchingsOfThisBranch.add(makeRelations(curNode, false));
-        }
-        
-        
-        
-        
-        
-        
-        else if(checker.isLoop(curNode.Statement)){
-            //System.out.println("loop - "+ curNode.Statement);
-            
-            if(branchingsOfThisBranch.size()>0){
-                for(int i=0; i<branchingsOfThisBranch.size(); i++){
-                    branchingsOfThisBranch.get(i).childs.add(curNode);
-                    branchingsOfThisBranch.clear();
+                else{
+                    par.childs.add(curNode);
                 }
-            }
-            else{
-                par.childs.add(curNode);
-            }
-            branchingsOfThisBranch.add(curNode);
-            cur++;
-            makeRelations(curNode, true);
-        }
-        
-        
-        
-        
-        
-        
-        else{
-            //System.out.println("Statement - "+ curNode.Statement+branchingsOfThisBranch.size());
-             if(branchingsOfThisBranch.size()>0){
-                for(int i=0; i<branchingsOfThisBranch.size(); i++){
-                    branchingsOfThisBranch.get(i).childs.add(curNode);
+                //branchingsOfThisBranch.add(curNode);
+                cur++;
+                if(checker.foundEnd(curNode.Statement)){
+                    if(inLoop==true) {
+                        curNode.childs.add(branchRoot);
+                    }
+                    return curNode;
                 }
-                branchingsOfThisBranch.clear();
+                par = curNode;
             }
-            else{
-                par.childs.add(curNode);
-            }
-            //branchingsOfThisBranch.add(curNode);
-            cur++;
-            if(checker.foundEnd(curNode.Statement)){
-                if(inLoop==true) {
-                    curNode.childs.add(branchRoot);
-                }
-                return curNode;
-            }
-            par = curNode;
-        }
-           
-        
-        
-        
-            
-        
         }
         return null;
     }
@@ -201,7 +166,7 @@ public class MakeGraph {
                 }
             }
         }
-        try (FileWriter myWriter = new FileWriter("F:\\Downloads\\CFG-master\\LeveledNodes.txt")) {
+        try (FileWriter myWriter = new FileWriter("/home/shirsho/Desktop/testing/cfgjava/CFG/cfg/LeveledNodes.txt")) {
             myWriter.write((Lines.size())+"\n");
             for(int i=0; i<Lines.size(); i++){
                 myWriter.write(i + " " + level[i]+"\n");
@@ -220,17 +185,22 @@ public class MakeGraph {
             }
             System.out.println();
         }
+        int nodes = 0; int edges = 0;
+        nodes = Lines.size();
         System.out.println("\nAdjacency Matrix:");
         for(int i=0; i<Lines.size(); i++){
             System.out.print("\t"+i+"\t");
             for(int j=0; j<Lines.size(); j++){
+                if(adj[i][j]==1) edges++;
                 System.out.print(adj[i][j]+" ");
             }
             System.out.println();
         }
+
+        System.out.println("Cyclomatic complexity: "+(edges-nodes+2));
     }
     public void saveGraph() throws IOException{
-        try (FileWriter myWriter = new FileWriter("F:\\Downloads\\CFG-master\\Edges.txt")) {
+        try (FileWriter myWriter = new FileWriter("/home/shirsho/Desktop/testing/cfgjava/CFG/cfg/Edges.txt")) {
             //myWriter.write((Lines.size())+"\n");
             for(int i=0; i<Lines.size(); i++){
                 for(int j=0; j<Lines.size(); j++){

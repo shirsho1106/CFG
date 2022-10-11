@@ -20,7 +20,7 @@ public class Main {
        String fileName;                         // F:\\Downloads\\CFG-master\\test.txt
        Scanner input = new Scanner(System.in);
        fileName = input.next();
-       SourceCodeReader Sc;                
+       SourceCodeReader Sc;
        Sc = new SourceCodeReader(fileName);
     }  
 }
