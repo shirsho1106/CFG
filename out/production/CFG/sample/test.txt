@@ -1,0 +1,21 @@
+#include<stdio.h>
+int main(){
+int numb = 20;
+if(numb==25){
+printf("twenty-five");
+}
+else if(a>=20 || a<=15){
+printf("twenty");
+}
+else{
+printf("None");
+}
+int k = 0;
+for(int i=0; i<10 ; i++){
+k++;
+}
+while(k>0){
+k--;
+}
+return 0;
+}
